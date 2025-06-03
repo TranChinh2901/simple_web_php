@@ -179,10 +179,9 @@ if (isset($_POST['register'])) {
                     <option value="Nữ">Nữ</option>
                 </select>
             </div>
-
             <div class="button-group">
                 <button type="submit" name="register">Đăng Ký</button>
-                <button type="reset">Reset</button>
+                <!-- <button type="reset">Reset</button> -->
             </div>
         </form>
 

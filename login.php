@@ -1,8 +1,10 @@
 <?php
-include "database/db.php";
 session_start();
+include 'database/db.php';
+
 $error = "";
 
+// Kiểm tra kết nối database
 if (!$conn) {
     die("Kết nối database thất bại: " . mysqli_connect_error());
 }
@@ -13,40 +15,50 @@ if (isset($_POST['login'])) {
 
     // Kiểm tra email và mật khẩu có tồn tại hay không
     if (empty($email) || empty($password)) {
-        $error = "Vui lòng nhập email và mật khẩu.";
+        $error = "❌ Email hoặc password không được để trống";
     } else {
         // Sử dụng prepared statement để tránh SQL injection
         $sql = "SELECT * FROM users WHERE email = ?";
         $stmt = mysqli_prepare($conn, $sql);
+
         if ($stmt) {
             mysqli_stmt_bind_param($stmt, "s", $email);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
             $user = mysqli_fetch_assoc($result);
-            // Sử dụng password_verify để kiểm tra mật khẩu đã hash
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['name'] = $user['name'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['gender'] = $user['gender'];
-                $_SESSION['address'] = $user['address'];
-                $_SESSION['role'] = $user['role'];
 
-                //chuyển hướng sau khi đăng nhập
-                if ($user['role'] == 1) {
-                    header('Location: admin/index.php');
-                    exit();
+            if ($user) {
+                // Sử dụng password_verify để kiểm tra mật khẩu đã hash
+                if (password_verify($password, $user['password'])) {
+                    // Lưu thông tin user vào session
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['name'] = $user['name'];
+                    $_SESSION['email'] = $user['email'];
+                    $_SESSION['role'] = $user['role'];
+                    $_SESSION['gender'] = $user['gender'];
+
+                    // Điều hướng theo role
+                    if ($user['role'] == 1) {
+                        header('Location: admin/index.php');
+                        exit();
+                    } else {
+                        header('Location: index.php');
+                        exit();
+                    }
                 } else {
-                    header('Location: index.php');
-                    exit();
+                    $error = "❌ Mật khẩu không chính xác";
                 }
+            } else {
+                $error = "❌ Email không tồn tại trong hệ thống";
             }
+
+            mysqli_stmt_close($stmt);
+        } else {
+            $error = "❌ Lỗi hệ thống: " . mysqli_error($conn);
         }
     }
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -164,7 +176,7 @@ if (isset($_POST['login'])) {
 </head>
 
 <body>
-    <?php include "includes/Header.php" ?>
+    <?php include "includes/header.php" ?>
 
     <div class="login-container">
         <div class="login-form">
@@ -193,9 +205,9 @@ if (isset($_POST['login'])) {
                     <button type="submit" name="login" class="btn btn-login">
                         Đăng nhập
                     </button>
-                    <button type="reset" class="btn btn-reset">
+                    <!-- <button type="reset" class="btn btn-reset">
                         Làm mới
-                    </button>
+                    </button> -->
                 </div>
 
                 <div class="register-link">
@@ -205,6 +217,7 @@ if (isset($_POST['login'])) {
         </div>
     </div>
 
+    <?php include "includes/footer.php"; ?>
 </body>
 
 </html>
