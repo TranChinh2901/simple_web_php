@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,10 +26,45 @@
             </ul>
         </nav>
 
-        <div class="user-links">
-            <a href="login.php">Login</a>
-            <a href="register.php">Register</a>
+        <div class="dropdown">
+            <button>
+                <i class="fas fa-user-circle"></i>
+                <?php
+                if (isset($_SESSION['user_id']) && isset($_SESSION['name'])) {
+                    echo "Xin chào, " . htmlspecialchars($_SESSION['name']);
+                } else {
+                    echo "Tài khoản";
+                }
+                ?>
+                <i class="fas fa-caret-down"></i>
+            </button>
+            <div class="dropdown-content">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 0): // Vai trò người dùng 
+                    ?>
+                        <a href="profile_user.php"><i class="fas fa-user"></i> Hồ sơ</a>
+                        <a href="cart.php"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] == 1): // Vai trò admin 
+                    ?>
+                        <a href="admin/index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="profile_user.php"><i class="fas fa-user"></i> Hồ sơ</a>
+                        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    <?php else: ?>
+                        <!-- Trường hợp role không xác định -->
+                        <a href="profile_user.php"><i class="fas fa-user"></i> Hồ sơ</a>
+                        <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <div class="user-links">
+                        <a href="login.php">Login</a>
+                        <a href="register.php">Register</a>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
+
+
 
         <!-- Hamburger menu for mobile -->
         <div class="hamburger" onclick="toggleMobileMenu()">
@@ -35,6 +74,7 @@
         </div>
     </div>
 
+
     <div class="mobile-menu" id="mobileMenu">
         <div class="close-menu" onclick="toggleMobileMenu()">&times;</div>
         <div class="mobile-menu-content">
@@ -43,10 +83,31 @@
                 <li><a class="a-header" href="about.php" onclick="toggleMobileMenu()">About</a></li>
                 <li><a class="a-header" href="contact.php" onclick="toggleMobileMenu()">Contact</a></li>
             </ul>
-            <div class="user-links">
-                <a href="login.php" onclick="toggleMobileMenu()">Login</a>
-                <a href="register.php" onclick="toggleMobileMenu()">Register</a>
-            </div>
+
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <div class="user-links">
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 0): // Vai trò người dùng 
+                    ?>
+                        <a href="profile_user.php" onclick="toggleMobileMenu()"><i class="fas fa-user"></i> Hồ sơ</a>
+                        <a href="cart.php" onclick="toggleMobileMenu()"><i class="fas fa-shopping-cart"></i> Giỏ hàng</a>
+                        <a href="logout.php" onclick="toggleMobileMenu()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    <?php elseif (isset($_SESSION['role']) && $_SESSION['role'] == 1): // Vai trò admin 
+                    ?>
+                        <a href="admin/index.php" onclick="toggleMobileMenu()"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a href="profile_user.php" onclick="toggleMobileMenu()"><i class="fas fa-user"></i> Hồ sơ</a>
+                        <a href="logout.php" onclick="toggleMobileMenu()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    <?php else: ?>
+                        <!-- Trường hợp role không xác định -->
+                        <a href="profile_user.php" onclick="toggleMobileMenu()"><i class="fas fa-user"></i> Hồ sơ</a>
+                        <a href="logout.php" onclick="toggleMobileMenu()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    <?php endif; ?>
+                </div>
+            <?php else: ?>
+                <div class="user-links">
+                    <a href="login.php" onclick="toggleMobileMenu()">Login</a>
+                    <a href="register.php" onclick="toggleMobileMenu()">Register</a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 
